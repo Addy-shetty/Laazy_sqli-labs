@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:11
+    environment:
+      POSTGRES_PASSWORD: insecure
+      POSTGRES_DB: vulnapp
+    networks:
+      - internal
+    cap_drop:
+      - ALL
+
+  mysql:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: insecure
+      MYSQL_DATABASE: vulnapp
+    networks:
+      - internal
+    cap_drop:
+      - ALL
+
+  web:
+    build: .
+    ports:
+      - "8080:80"
+    depends_on:
+      - postgres
+      - mysql
+    networks:
+      - internal
+    cap_drop:
+      - ALL
+
+networks:
+  internal:
+    driver: bridge
