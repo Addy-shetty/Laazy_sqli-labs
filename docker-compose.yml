@@ -2,14 +2,18 @@ version: '3.8'
 
 services:
   postgres:
-    image: postgres:11
+    image: postgres:11-alpine
     environment:
       POSTGRES_PASSWORD: insecure
       POSTGRES_DB: vulnapp
     networks:
       - internal
-    cap_drop:
-      - ALL
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    deploy:
+      resources:
+        limits:
+          memory: 512M
 
   mysql:
     image: mysql:5.7
@@ -18,8 +22,13 @@ services:
       MYSQL_DATABASE: vulnapp
     networks:
       - internal
-    cap_drop:
-      - ALL
+    volumes:
+      - mysql_data:/var/lib/mysql
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    command: --performance_schema=off
 
   web:
     build: .
@@ -30,8 +39,12 @@ services:
       - mysql
     networks:
       - internal
-    cap_drop:
-      - ALL
+    volumes:
+      - .:/app
+
+volumes:
+  postgres_data:
+  mysql_data:
 
 networks:
   internal:
